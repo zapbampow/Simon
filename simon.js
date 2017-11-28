@@ -41,9 +41,9 @@ $('.on-off-switch').click (function() {
 //
 var boardButtons = [
   {color:'green', defaultClass:'green-btn', pressedClass:'light-green', sound:'greenSound'},
-  {color:'red', defaultClass:'red-btn', pressedClass:'light-red', sound:'redSound'} ,
-  {color:'blue', defaultClass:'blue-btn', pressedClass:'light-blue', sound:'blueSound'},
-  {color:'yellow', defaultClass:'yellow-btn', pressedClass:'light-yellow', sound:'yellowSound'}
+  {color:'red', defaultClass:'red-btn', pressedClass:'light-red', sound:'redSound'},
+  {color:'yellow', defaultClass:'yellow-btn', pressedClass:'light-yellow', sound:'yellowSound'},
+  {color:'blue', defaultClass:'blue-btn', pressedClass:'light-blue', sound:'blueSound'}
 ];
 var computerArr = [1, 2, 0, 3];
 var playerMoves = [];
@@ -86,38 +86,28 @@ function addToSequence() {
   computerArr.push(Math.floor(Math.random() * 4));
 }
 
-/** Plays through the saved computerArr sequence by highlighting each button and playing a corresponding sound.
-* @playSequence
+
+/** Loops through the sequence of colors and creates a string of code that when run, will turn on and off the buttons in sequence.
+* @buildSequenceCode
+* @param arr - specifically computerArr where the sequence is stored
 */
-var tempNum;
-function playSequence(arr) {
-  arr.forEach(function (el) {
-    buttonOn(el);
-    buttonOff(el);
-  });
+var sequenceCode;
 
-
+function buildSequenceCode(arr) {
+  var codeArr = [];
+  var code = '';
+  for(i=0; i<arr.length; i++) {
+    codeArr.push(code.concat("setTimeout(function() {$('." + boardButtons[arr[i]].defaultClass + "').addClass('" + boardButtons[arr[i]].pressedClass + "');}, " + (i*1000+200) + ");"+ "setTimeout(function() {$('." + boardButtons[arr[i]].defaultClass + "').removeClass('" + boardButtons[arr[i]].pressedClass + "');}, " + (i+1)*1000 + ");"
+  ));
+  }
+  sequenceCode = codeArr.join("");
+//   arr.reduce(function (acc, cur, curInd) {
+//     code = precode.concat("$('." + boardButtons[cur].defaultClass + "').addClass(" + boardButtons[cur].pressedClass + ");"+ "setTimeout(function() {$('.'" + boardButtons[cur].defaultClass + ").removeClass(" + boardButtons[cur].pressedClass + ");}, " + (curInd+1)*1000 + ");)});"
+//   );}
+// );
 }
 
-/****/
-function testFunc(num) {
-  setTimeout(function() {
-      $('.' + boardButtons[num].defaultClass).addClass(boardButtons[num].pressedClass);
-    }, 200);
-    setTimeout(function() {
-      $("." + boardButtons[num].defaultClass).removeClass(boardButtons[num].pressedClass);
-    }, 2000);
-}
 
-function buttonOn(num) {
-  $('.' + boardButtons[num].defaultClass).addClass(boardButtons[num].pressedClass);
-}
-
-function buttonOff(num) {
-  setTimeout(function() {
-    $("." + boardButtons[num].defaultClass).removeClass(boardButtons[num].pressedClass);
-  }, 2000);
-}
 
 
 // TODO: If "on", when you click "Start", the count-box blinks 2 times.
@@ -127,6 +117,7 @@ function buttonOff(num) {
 // TODO: At each press the button is inputted into an array and compared to the colors given by the computer.
 // TODO: At each press if it is correct the user can continue pressing until either they choose a wrong button, or until they complete the sequence. At that point the computer takes over again.
 // TODO: If the length of the sequence is 20 and the user completes a sequence, then the user wins.
+// TODO: When press start, reset sequenceCode to undefined.
 
 
 

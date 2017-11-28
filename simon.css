@@ -62,7 +62,7 @@ h1 {
   z-index: 0;
 }
 
-.bottom-left-button {
+.bottom-right-button {
   height: 100%;
   width: 50%;
   border-radius: 0 0 100% 0;
@@ -74,7 +74,7 @@ h1 {
 	background-color: blue;
 }
 
-.bottom-right-button {
+.bottom-left-button {
   height: 100%;
   width: 50%;
   border-radius: 0 0 0 100%;
