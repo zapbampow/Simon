@@ -30,9 +30,10 @@ $('.start-btn')
       $(this).addClass('btn-shadow');
     }
     // If the game is on, the button moves back up and the count-box blinks before the game starts.
-    else if(strictMode === false){
+    else{
       $(this).addClass('btn-shadow');
       countBoxBlinking();
+
       setTimeout(function() {startGame();}, 1200);
     }
   });
@@ -125,7 +126,8 @@ function buildSequenceRunthroughCode(arr) {
   ));
   }
   sequenceRunthroughCode = codeArr.join("");
-  runSequence = new Function(sequenceRunthroughCode);
+  sequenceRunthroughCodePlusUserTurnTrue = sequenceRunthroughCode.concat("setTimeout(function() {userTurn = true;}, " + (theSequence.length*1000+1) + "); $('.color-game-btn').css( 'cursor', 'pointer' );");
+  runSequence = new Function(sequenceRunthroughCodePlusUserTurnTrue);
 }
 
 /**
@@ -156,34 +158,130 @@ function clearPlayerMoves() {
 function lengthenSequence() {
   addToSequence();
   buildSequenceRunthroughCode(theSequence);
-  runSequence();
   clearPlayerMoves();
   updateCountBox(theSequence);
-  userTurn = true;
+  runSequence();
 }
 
 //Event listener for user pressing colored buttons
-// TODO: Add conditionals for whether it is actually the user's turn
-$('.color-game-btn').mousedown(function() {
-  if(playerTurn === true) {
-    if($(this).hasClass('green-btn')) {
-      playerMoves.push(0);
-      greenSound.play();
+// Includes
+$('.color-game-btn').click(function() {
+    // Check if it's actually the user's turn to go
+    if(userTurn === true) {
+      userTurn = false;
+      // Check for green button
+      if($(this).hasClass('green-btn')) {
+        // Add move to the playerMoves array
+        playerMoves.push(0);
+        $('.green-btn').addClass('light-green');
+
+        // If the move matches the sequence, play correct sound, return button to original color, then correctUserInput
+        if(checkUserInputAgainstSequence(theSequence, playerMoves) === true){
+          greenSound.play();
+          setTimeout(function(){$('.green-btn').removeClass('light-green');}, 500);
+          setTimeout(correctUserInput, 700);
+        }
+        // If doesn't match, wrong sound, original color, and wrongUserInput
+        else {
+          wrongMoveSound();
+          setTimeout(function(){$('.green-btn').removeClass('light-green');}, 500);
+          setTimeout(wrongUserInput, 700);
+        }
+      }
+      // Check for Red Button
+      else if($(this).hasClass('red-btn')) {
+        // Add move to the playerMoves array
+        playerMoves.push(1);
+        $('.red-btn').addClass('light-red');
+
+        // If the move matches the sequence, play correct sound, return button to original color, then correctUserInput
+        if(checkUserInputAgainstSequence(theSequence, playerMoves) === true){
+          redSound.play();
+          setTimeout(function(){$('.red-btn').removeClass('light-red');}, 500);
+          setTimeout(correctUserInput, 700);
+        }
+        // If doesn't match, wrong sound, original color, and wrongUserInput
+        else {
+          wrongMoveSound();
+          setTimeout(function(){$('.red-btn').removeClass('light-red');}, 500);
+          setTimeout(wrongUserInput, 700);
+        }
+      }
+      // Check for yellow Button
+      else if($(this).hasClass('yellow-btn')) {
+        // Add move to the playerMoves array
+        playerMoves.push(2);
+        $('.yellow-btn').addClass('light-yellow');
+
+        // If the move matches the sequence, play correct sound, return button to original color, then correctUserInput
+        if(checkUserInputAgainstSequence(theSequence, playerMoves) === true){
+          yellowSound.play();
+          setTimeout(function(){$('.yellow-btn').removeClass('light-yellow');}, 500);
+          setTimeout(correctUserInput, 700);
+        }
+        // If doesn't match, wrong sound, original color, and wrongUserInput
+        else {
+          wrongMoveSound();
+          setTimeout(function(){$('.yellow-btn').removeClass('light-yellow');}, 500);
+          setTimeout(wrongUserInput, 700);
+        }
+      }
+      // Check for Red Button
+      else if($(this).hasClass('blue-btn')) {
+        // Add move to the playerMoves array
+        playerMoves.push(3);
+        $('.blue-btn').addClass('light-blue');
+
+        // If the move matches the sequence, play correct sound, return button to original color, then correctUserInput
+        if(checkUserInputAgainstSequence(theSequence, playerMoves) === true){
+          blueSound.play();
+          setTimeout(function(){$('.blue-btn').removeClass('light-blue');}, 500);
+          setTimeout(correctUserInput, 700);
+        }
+        // If doesn't match, wrong sound, original color, and wrongUserInput
+        else {
+          wrongMoveSound();
+          setTimeout(function(){$('.blue-btn').removeClass('light-blue');}, 500);
+          setTimeout(wrongUserInput, 700);
+        }
+      }
     }
-    else if($(this).hasClass('red-btn')){
-      playerMoves.push(1);
-      redSound.play();
-    }
-    else if($(this).hasClass('yellow-btn')){
-      playerMoves.push(2);
-      yellowSound.play();
-    }
-    else if($(this).hasClass('blue-btn')){
-      playerMoves.push(3);
-      blueSound.play();
-    }
+  });
+
+
+/** Checks if this is the final index in the sequence. If so, it adds another and plays for the user.
+* @correctUserInput
+*/
+function correctUserInput() {
+  if(playerMoves.length === 20 && theSequence.length === 20) {
+    celebration();
+  }
+  else if(playerMoves.length === theSequence.length) {
+    $('.color-game-btn').css( 'cursor', 'default' );
+    lengthenSequence();
+  }
+  else {
+    userTurn = true;
+  }
 }
-});
+
+/** Plays through the sequence and resets the playerMoves array so the player can try again.
+* @wrongUserInput
+*/
+function wrongUserInput() {
+  clearPlayerMoves();
+  setTimeout(function() {runSequence();}, 800);
+}
+
+/** Plays all 4 button sounds at once.
+* @wrongMoveSound
+*/
+function wrongMoveSound() {
+  greenSound.play();
+  redSound.play();
+  blueSound.play();
+  yellowSound.play();
+}
 
 /** Returns true or false. Checks each color button the user presses against theSequence.
 * @checkUserInputAgainstSequence
@@ -191,24 +289,64 @@ $('.color-game-btn').mousedown(function() {
 * @param playerMoves - the second array is the user's input
 */
 function checkUserInputAgainstSequence(theSequence, playerMoves) {
-  var movesAreCorrect = true;
-  for(i=0; i<theSequence.length; i++) {
-    if(theSequence[i] !== playerMoves[i]){
-      movesAreCorrect = false;
-    }
+  var inputIndex = playerMoves.length - 1;
+  if(playerMoves[inputIndex] !== theSequence[inputIndex]) {
+    return false;
   }
-  return movesAreCorrect;
+  else {
+    return true;
+  }
 }
 
-// TODO: Then the program for the game runs.
-// TODO: The game: First the game chooses a random color. It displays that color and plays corresponding sound.
-// TODO: Then it waits for input from the user. While it is the user's turn the user may press any of the color buttons, which switch to a cursor when hovering over them. While pressed the color changes and the sound plays for that color.
-// TODO: At each press the button is inputted into an array and compared to the colors given by the computer.
-// TODO: At each press if it is correct the user can continue pressing until either they choose a wrong button, or until they complete the sequence. At that point the computer takes over again.
-// TODO: If the length of the sequence is 20 and the user completes a sequence, then the user wins.
-// TODO: When press start, reset sequenceRunthroughCode to undefined.
+/****/
+function celebration() {
+  $('.color-game-btn').css( 'cursor', 'default' );
+  greenSound.play();
+  $('.green-btn').addClass('light-green');
+  $('.count-box h2').html('WIN');
+  setTimeout(function(){
+    $('.green-btn').removeClass('light-green');
+    $('.red-btn').addClass('light-red');
+    redSound.play();
+  }, 250);
+  setTimeout(function(){
+    $('.red-btn').removeClass('light-red');
+    $('.blue-btn').addClass('light-blue');
+    blueSound.play();
+  }, 500);
+  setTimeout(function(){
+    $('.blue-btn').removeClass('light-blue');
+    $('.yellow-btn').addClass('light-yellow');
+    yellowSound.play();
+  }, 750);
+  setTimeout(function(){
+    $('.yellow-btn').removeClass('light-yellow');
+    $('.green-btn').addClass('light-green');
+    greenSound.play();
+  }, 1000);
+  setTimeout(function(){
+    $('.green-btn').removeClass('light-green');
+    $('.red-btn').addClass('light-red');
+    redSound.play();
+  }, 1250);
+  setTimeout(function(){
+    $('.red-btn').removeClass('light-red');
+    $('.blue-btn').addClass('light-blue');
+    blueSound.play();
+  }, 1500);
+  setTimeout(function(){
+    $('.blue-btn').removeClass('light-blue');
+    $('.yellow-btn').addClass('light-yellow');
+    yellowSound.play();
+  }, 1750);
+  setTimeout(function(){
+    $('.yellow-btn').removeClass('light-yellow');
+  }, 2000);
 
+}
 
-
+// TODO: Add hover effects to buttons.
+// TODO: When hitting off, stop everything, apparently by throwing some big error.
+// TODO: When hitting start, do the same as hitting off before doing anything else. This way you can start over immediately.
 
 //
