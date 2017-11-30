@@ -44,7 +44,7 @@ h1 {
 	border-right: 3px #212529 solid;
 	border-bottom: 3px #212529 solid;
 	border-left: 10px #212529 solid;
-	background-color: green;
+	background-color: #008000;
   box-shadow: -0.1em -0.1em 1em #000000;
   z-index: 0;
 }
@@ -57,7 +57,7 @@ h1 {
 	border-right: 10px #212529 solid;
 	border-bottom: 3px #212529 solid;
 	border-left: 3px #212529 solid;
-	background-color: red;
+	background-color: #c90000;
   box-shadow: 0.1em -0.1em 1em #000000;
   z-index: 0;
 }
@@ -71,7 +71,7 @@ h1 {
 	border-bottom: 10px #212529 solid;
 	border-left: 3px #212529 solid;
   box-shadow: 0.1em 0.1em 1em #000000;
-	background-color: blue;
+	background-color: #000070;
 }
 
 .bottom-left-button {
@@ -82,7 +82,7 @@ h1 {
 	border-right: 3px #212529 solid;
 	border-bottom: 10px #212529 solid;
 	border-left: 10px #212529 solid;
-	background-color: yellow;
+	background-color: #bfbf00;
   box-shadow: -0.1em 0.1em 1em #000000;
   z-index: 0;
 }
@@ -92,7 +92,7 @@ h1 {
   margin: 0 auto -108% auto;
   height: 250px;
   width: 250px;
-  background-color: white;
+  background-color: #ffffff;
   border: 10px #212529 solid;
   border-radius: 50%;
   position: relative;
@@ -148,7 +148,7 @@ h1 {
 }
 
 .strict-btn-on {
-  background-color: green;
+  background-color: #008000;
 }
 
 .btn-shadow {
@@ -200,13 +200,13 @@ h1 {
 }
 
 .light-red {
-  background-color: #f79393;
+  background-color: #ff0000;
 }
 
 .light-blue {
-  background-color: #9e9ef9;
+  background-color: #0000ff;
 }
 
 .light-yellow {
-  background-color: #fafa95;
+  background-color: #ffff00;
 }
