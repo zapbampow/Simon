@@ -12,6 +12,7 @@ var theSequence = [];
 var playerMoves = [];
 var userTurn = false;
 var strictMode = false;
+var gameOn = false;
 
 //
 // BUTTON PRESSING AND STYLING
@@ -64,11 +65,17 @@ $('.on-off-switch').click (function() {
   if($(this).hasClass('off')) {
     $(this).removeClass('off').addClass('on');
     $('.count-box').removeClass('count-off').addClass('count-on');
+    gameOn = true;
   }
   else {
+    gameOn = false;
     $(this).removeClass('on').addClass('off');
     $('.count-box').removeClass('count-on').addClass('count-off');
     $('.count-box h2').html('--');
+    $('.green-btn').removeClass('light-green');
+    $('.red-btn').removeClass('light-red');
+    $('.yellow-btn').removeClass('light-yellow');
+    $('.blue-btn').removeClass('light-blue');
   }
 });
 
@@ -122,11 +129,11 @@ function buildSequenceRunthroughCode(arr) {
   var codeArr = [];
   var code = '';
   for(i=0; i<arr.length; i++) {
-    codeArr.push(code.concat("setTimeout(function() {$('." + boardButtons[arr[i]].defaultClass + "').addClass('" + boardButtons[arr[i]].pressedClass + "'); " + boardButtons[arr[i]].sound + ".play();}, " + (i*1000+200) + ");"+ "setTimeout(function() {$('." + boardButtons[arr[i]].defaultClass + "').removeClass('" + boardButtons[arr[i]].pressedClass + "');}, " + (i+1)*1000 + ");"
+    codeArr.push(code.concat("setTimeout(function() {if(gameOn === true) {$('." + boardButtons[arr[i]].defaultClass + "').addClass('" + boardButtons[arr[i]].pressedClass + "'); " + boardButtons[arr[i]].sound + ".play();}}, " + (i*1000+200) + ");"+ "setTimeout(function() {if(gameOn === true) {$('." + boardButtons[arr[i]].defaultClass + "').removeClass('" + boardButtons[arr[i]].pressedClass + "');}}, " + (i+1)*1000 + ");"
   ));
   }
   sequenceRunthroughCode = codeArr.join("");
-  sequenceRunthroughCodePlusUserTurnTrue = sequenceRunthroughCode.concat("setTimeout(function() {userTurn = true;}, " + (theSequence.length*1000+1) + "); $('.color-game-btn').css( 'cursor', 'pointer' );");
+  sequenceRunthroughCodePlusUserTurnTrue = sequenceRunthroughCode.concat("setTimeout(function() {if(gameOn === true) {userTurn = true;}}, " + (theSequence.length*1000+1) + "); $('.color-game-btn').css( 'cursor', 'pointer' );");
   runSequence = new Function(sequenceRunthroughCodePlusUserTurnTrue);
 }
 
@@ -183,9 +190,14 @@ $('.color-game-btn').click(function() {
         }
         // If doesn't match, wrong sound, original color, and wrongUserInput
         else {
-          wrongMoveSound();
-          setTimeout(function(){$('.green-btn').removeClass('light-green');}, 500);
-          setTimeout(wrongUserInput, 700);
+          if(strictMode === true){
+            strictReset();
+          }
+          else {
+            wrongMoveSound();
+            setTimeout(function(){$('.green-btn').removeClass('light-green');}, 500);
+            setTimeout(wrongUserInput, 700);
+          }
         }
       }
       // Check for Red Button
@@ -202,9 +214,14 @@ $('.color-game-btn').click(function() {
         }
         // If doesn't match, wrong sound, original color, and wrongUserInput
         else {
+          if(strictMode === true){
+            strictReset();
+          }
+          else {
           wrongMoveSound();
           setTimeout(function(){$('.red-btn').removeClass('light-red');}, 500);
           setTimeout(wrongUserInput, 700);
+        }
         }
       }
       // Check for yellow Button
@@ -221,9 +238,14 @@ $('.color-game-btn').click(function() {
         }
         // If doesn't match, wrong sound, original color, and wrongUserInput
         else {
+          if(strictMode === true){
+            strictReset();
+          }
+          else {
           wrongMoveSound();
           setTimeout(function(){$('.yellow-btn').removeClass('light-yellow');}, 500);
           setTimeout(wrongUserInput, 700);
+        }
         }
       }
       // Check for Red Button
@@ -240,9 +262,14 @@ $('.color-game-btn').click(function() {
         }
         // If doesn't match, wrong sound, original color, and wrongUserInput
         else {
+          if(strictMode === true){
+            strictReset();
+          }
+          else {
           wrongMoveSound();
           setTimeout(function(){$('.blue-btn').removeClass('light-blue');}, 500);
           setTimeout(wrongUserInput, 700);
+        }
         }
       }
     }
@@ -283,6 +310,22 @@ function wrongMoveSound() {
   yellowSound.play();
 }
 
+/** Resets appropriate factors to reset game. Used when someone is using strict mode and clicks a wrong sequence.
+* @strictReset
+*/
+function strictReset() {
+  wrongMoveSound();
+  $('.count-box h2').html('--');
+  $('.green-btn').removeClass('light-green');
+  $('.red-btn').removeClass('light-red');
+  $('.yellow-btn').removeClass('light-yellow');
+  $('.blue-btn').removeClass('light-blue');
+  theSequence = [];
+  playerMoves = [];
+  userTurn = false;
+  setTimeout(function() {lengthenSequence();}, 1400);
+}
+
 /** Returns true or false. Checks each color button the user presses against theSequence.
 * @checkUserInputAgainstSequence
 * @param theSequence - the first array is the sequence, which the player moves must exactly match to return true
@@ -298,7 +341,9 @@ function checkUserInputAgainstSequence(theSequence, playerMoves) {
   }
 }
 
-/****/
+/** Animation for winning the game
+* @celebration
+*/
 function celebration() {
   $('.color-game-btn').css( 'cursor', 'default' );
   greenSound.play();
@@ -345,8 +390,7 @@ function celebration() {
 
 }
 
-// TODO: Add hover effects to buttons.
 // TODO: When hitting off, stop everything, apparently by throwing some big error.
 // TODO: When hitting start, do the same as hitting off before doing anything else. This way you can start over immediately.
-
+// TODO: Add StrictMode
 //
